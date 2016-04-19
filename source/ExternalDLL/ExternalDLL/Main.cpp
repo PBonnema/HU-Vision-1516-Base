@@ -10,43 +10,133 @@
 #include "ImageFactory.h"
 #include "DLLExecution.h"
 
+#include "basetimer.h"
+
 void drawFeatureDebugImage(IntensityImage &image, FeatureMap &features);
 bool executeSteps(DLLExecution * executor);
 
 int main(int argc, char * argv[]) {
 
-	ImageFactory::setImplementation(ImageFactory::DEFAULT);
-	//ImageFactory::setImplementation(ImageFactory::STUDENT);
+	//ImageFactory::setImplementation(ImageFactory::DEFAULT);
+	ImageFactory::setImplementation(ImageFactory::STUDENT);
 
 
-	ImageIO::debugFolder = "D:\\Users\\Rolf\\Downloads\\FaceMinMin";
+	ImageIO::debugFolder = R"R(C:\Users\Peter\Downloads\Vision\Debug map)R";
 	ImageIO::isInDebugMode = true; //If set to false the ImageIO class will skip any image save function calls
 
-
-
-
-	RGBImage * input = ImageFactory::newRGBImage();
-	if (!ImageIO::loadImage("D:\\Users\\Rolf\\Downloads\\TestA5.jpg", *input)) {
-		std::cout << "Image could not be loaded!" << std::endl;
-		system("pause");
-		return 0;
-	}
-
-
-	ImageIO::saveRGBImage(*input, ImageIO::getDebugFileName("debug.png"));
-
-	DLLExecution * executor = new DLLExecution(input);
-
-
-	if (executeSteps(executor)) {
-		std::cout << "Face recognition successful!" << std::endl;
-		std::cout << "Facial parameters: " << std::endl;
-		for (int i = 0; i < 16; i++) {
-			std::cout << (i+1) << ": " << executor->facialParameters[i] << std::endl;
+	try {
+		RGBImage * input = ImageFactory::newRGBImage();
+		if(!ImageIO::loadImage(R"R(C:\Users\Peter\Downloads\Vision\Practica_repo\testsets\Set A\fallen-storm-trooper.jpg)R", *input)) {
+			std::cout << "Image could not be loaded!" << std::endl;
+			system("pause");
+			return 0;
 		}
+
+
+		//Time RGBImageStudent performance
+		BaseTimer timer{};
+		const int width = input->getWidth();
+		const int height = input->getHeight();
+		const int pixels = width * height;
+		const int repeats = 5;
+
+		std::cout << "size: " << width << "x" << height << "\n";
+		std::cout << "pixels: " << pixels << "\n";
+
+		//getPixel(x, y) horizontal
+		timer.start();
+		for(int r = 0; r < repeats; r++) {
+			for(int y = 0; y < height; y++) {
+				for(int x = 0; x <= width; x++) {
+					input->getPixel(x, y);
+				}
+			}
+		}
+		timer.stop();
+		std::cout << "getPixel(x, y) horizontal took: " << timer.elapsedMilliSeconds() << " ms\n";
+		timer.reset();
+
+		//getPixel(x, y) vertical
+		timer.start();
+		for(int r = 0; r < repeats; r++) {
+			for(int x = 0; x < width; x++) {
+				for(int y = 0; y < height; y++) {
+					input->getPixel(x, y);
+				}
+			}
+		}
+		timer.stop();
+		std::cout << "getPixel(x, y) vertical took: " << timer.elapsedMilliSeconds() << " ms\n";
+		timer.reset();
+
+		//getPixel(i)
+		timer.start();
+		for(int r = 0; r < repeats; r++) {
+			for(int i = 0; i < pixels; i++) {
+				input->getPixel(i);
+			}
+		}
+		timer.stop();
+		std::cout << "getPixel(i) took: " << timer.elapsedMilliSeconds() << " ms\n";
+		timer.reset();
+
+		//setPixel(x, y) horizontal
+		timer.start();
+		for(int r = 0; r < repeats; r++) {
+			for(int y = 0; y < height; y++) {
+				for(int x = 0; x < width; x++) {
+					input->setPixel(x, y, { 1, 2, 3 });
+				}
+			}
+		}
+		timer.stop();
+		std::cout << "setPixel(x, y) horizontal took: " << timer.elapsedMilliSeconds() << " ms\n";
+		timer.reset();
+
+		//setPixel(x, y) vertical
+		timer.start();
+		for(int r = 0; r < repeats; r++) {
+			for(int x = 0; x < width; x++) {
+				for(int y = 0; y < height; y++) {
+					input->setPixel(x, y, { 1, 2, 3 });
+				}
+			}
+		}
+		timer.stop();
+		std::cout << "setPixel(x, y) vertical took: " << timer.elapsedMilliSeconds() << " ms\n";
+		timer.reset();
+
+		//setPixel(i)
+		timer.start();
+		for(int r = 0; r < repeats; r++) {
+			for(int i = 0; i < pixels; i++) {
+				input->setPixel(i, { 255, 0, 255 });
+			}
+		}
+		timer.stop();
+		std::cout << "setPixel(i) took: " << timer.elapsedMilliSeconds() << " ms\n";
+		timer.reset();
+
+		ImageIO::showImage(*input);
+
+		ImageIO::saveRGBImage(*input, ImageIO::getDebugFileName("debug.png"));
+
+		DLLExecution * executor = new DLLExecution(input);
+
+
+		if(executeSteps(executor)) {
+			std::cout << "Face recognition successful!" << std::endl;
+			std::cout << "Facial parameters: " << std::endl;
+			for(int i = 0; i < 16; i++) {
+				std::cout << (i + 1) << ": " << executor->facialParameters[i] << std::endl;
+			}
+		}
+		delete executor;
+
+	} catch(const std::exception& e) {
+		std::cerr << e.what();
 	}
 
-	delete executor;
 	system("pause");
 	return 1;
 }

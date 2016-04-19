@@ -21,4 +21,7 @@ public:
 
 	Intensity getPixel(int x, int y) const;
 	Intensity getPixel(int i) const;
+
+private:
+	Intensity** pixelData; //column major 2-d array of pixel structs on heap
 };
