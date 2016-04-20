@@ -38,7 +38,7 @@ int main(int argc, char * argv[]) {
 		const int width = input->getWidth();
 		const int height = input->getHeight();
 		const int pixels = width * height;
-		const int repeats = 5;
+		const int repeats = 10;
 
 		std::cout << "size: " << width << "x" << height << "\n";
 		std::cout << "pixels: " << pixels << "\n";
@@ -47,7 +47,7 @@ int main(int argc, char * argv[]) {
 		timer.start();
 		for(int r = 0; r < repeats; r++) {
 			for(int y = 0; y < height; y++) {
-				for(int x = 0; x <= width; x++) {
+				for(int x = 0; x < width; x++) {
 					input->getPixel(x, y);
 				}
 			}

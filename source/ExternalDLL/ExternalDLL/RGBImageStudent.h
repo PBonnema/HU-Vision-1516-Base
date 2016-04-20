@@ -7,8 +7,8 @@
 #pragma once
 
 #include "RGBImage.h"
-#include <vector>
-#include <map>
+//#include <vector>
+//#include <map>
 
 
 class RGBImageStudent : public RGBImage {

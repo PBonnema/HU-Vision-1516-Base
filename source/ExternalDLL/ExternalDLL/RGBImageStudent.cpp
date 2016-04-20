@@ -1,13 +1,13 @@
 #include "RGBImageStudent.h"
-#include <iostream>
 
 //Comment this line out to disable checking for out-of-bounds errors within the pixel access methods
 //The out-of-bounds check also makes sure the image is initialized with a width>0 and height>0 before accessing any pixels because the default size is 0,0
-#define OUT_OF_BOUNDS_CHECK
+//#define OUT_OF_BOUNDS_CHECK
 
 #ifdef OUT_OF_BOUNDS_CHECK
 
 #include <exception>
+#include <string>
 class RGBImageException : public std::exception {
 	std::string msg;
 public:
@@ -65,10 +65,12 @@ void RGBImageStudent::set(const int width, const int height) {
 	//TODO: resize or create a new pixel storage (Don't forget to delete the old storage)
 
 	//delete old pixel storage
-	for(int i = 0; i < oldWidth; i++) {
-		delete pixelData[i];
+	if(pixelData != nullptr) { //don't attempt to delete when pixelData was never initialized
+		for(int i = 0; i < oldWidth; i++) {
+			delete pixelData[i];
+		}
+		delete pixelData;
 	}
-	delete pixelData;
 
 	//initialize some new memory with different dimensions
 	pixelData = new RGB*[width];
@@ -83,14 +85,20 @@ void RGBImageStudent::set(const RGBImageStudent &other) {
 	//TODO: resize or create a new pixel storage and copy the object (Don't forget to delete the old storage)
 
 	//delete old pixel storage
-	for(int i = 0; i < width; i++) {
-		delete pixelData[i];
+	if(pixelData != nullptr) { //don't attempt to delete when pixelData was never initialized
+		for(int i = 0; i < width; i++) {
+			delete pixelData[i];
+		}
+		delete pixelData;
 	}
-	delete pixelData;
 
-	//copy other's pixelData
 	width = other.getWidth();
 	int height = other.getHeight();
+
+	//initialize some new memory with different dimensions
+	pixelData = new RGB*[width];
+
+	//copy other's pixelData
 	for(int x = 0; x < width; x++) {
 		pixelData[x] = new RGB[height]; //init new columns
 
