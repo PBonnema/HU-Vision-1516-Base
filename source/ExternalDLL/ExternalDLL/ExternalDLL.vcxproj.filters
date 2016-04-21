@@ -117,6 +117,15 @@
     <ClInclude Include="basetimer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="RGBImage2dRowMajor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RGBImage2dColumnMajor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RGBImageSemi2D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Image.cpp">
@@ -176,9 +185,6 @@
     <ClCompile Include="HereBeDragons.cpp">
       <Filter>Source Files\private\disableautocomplete</Filter>
     </ClCompile>
-    <ClCompile Include="RGBImageStudent.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ImageFactory.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -195,6 +201,9 @@
       <Filter>Source Files\private\disableautocomplete</Filter>
     </ClCompile>
     <ClCompile Include="basetimer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RGBImageStudent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

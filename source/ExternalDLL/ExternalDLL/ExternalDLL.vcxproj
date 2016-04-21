@@ -84,6 +84,9 @@
     <ClInclude Include="Feature.h" />
     <ClInclude Include="FeatureMap.h" />
     <ClInclude Include="GrayscaleAlgorithm.h" />
+    <ClInclude Include="RGBImage2dColumnMajor.h" />
+    <ClInclude Include="RGBImage2dRowMajor.h" />
+    <ClInclude Include="RGBImageSemi2D.h" />
     <ClInclude Include="SonnetXVIII.h" />
     <ClInclude Include="Image.h" />
     <ClInclude Include="ImageFactory.h" />
@@ -115,6 +118,7 @@
     <ClCompile Include="Feature.cpp" />
     <ClCompile Include="FeatureMap.cpp" />
     <ClCompile Include="GrayscaleAlgorithm.cpp" />
+    <ClCompile Include="RGBImageStudent.cpp" />
     <ClCompile Include="SonnetXVIII.cpp" />
     <ClCompile Include="Image.cpp" />
     <ClCompile Include="ImageFactory.cpp" />
@@ -128,7 +132,6 @@
     <ClCompile Include="Representation.cpp" />
     <ClCompile Include="RGBImage.cpp" />
     <ClCompile Include="RGBImagePrivate.cpp" />
-    <ClCompile Include="RGBImageStudent.cpp" />
     <ClCompile Include="StudentExtraction.cpp" />
     <ClCompile Include="StudentLocalization.cpp" />
     <ClCompile Include="StudentPreProcessing.cpp" />

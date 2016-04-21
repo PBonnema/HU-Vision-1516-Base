@@ -1,159 +1,175 @@
+//Geimplementeerd met een 2-D contiguous row-major array
+
 #include "IntensityImageStudent.h"
 
 //Comment this line out to disable checking for out-of-bounds errors within the pixel access methods
 //The out-of-bounds check also makes sure the image is initialized with a width>0 and height>0 before accessing any pixels because the default size is 0,0
-#define OUT_OF_BOUNDS_CHECK
+//#define OUT_OF_BOUNDS_CHECK
 
-IntensityImageStudent::IntensityImageStudent() : IntensityImage(), pixelData{ nullptr } {
+#ifdef OUT_OF_BOUNDS_CHECK
+
+#include <exception>
+#include <string>
+class IntensityImageException : public std::exception {
+	std::string msg;
+public:
+	IntensityImageException(const std::string& msg) : msg(msg) {}
+	const char* what() const override{
+		return msg.c_str();
+	}
+};
+
+#endif
+
+
+IntensityImageStudent::IntensityImageStudent() : IntensityImage{}, pixelData{ nullptr }
+{
 }
 
+
 IntensityImageStudent::IntensityImageStudent(const IntensityImageStudent &other) :
-IntensityImage(other.getWidth(), other.getHeight()),
-pixelData{ new Intensity*[other.getWidth()] } //init pixelData as an array of columns (it's a column-major 2d array)
+IntensityImage{ other.getWidth(), other.getHeight() },
+pixelData{ new Intensity*[other.getHeight()] } //init pixelData as an array of rows (it's a row-major 2d array)
 {
 	int width = getWidth(), height = getHeight();
-	for(int x = 0; x < width; x++) {
-		pixelData[x] = new Intensity[height]; //init new columns
+
+	//Init the whole memory as a contiguous block and let the first pointer point to the beginning of it.
+	//This also serves as the pointer to the first row
+	pixelData[0] = new Intensity[width * height];
+
+	for(int y = 0; y < height; y++) { //we cannot skip the first row now because we need to copy other
+		pixelData[y] = &(pixelData[0][width * y]); //init new rows
 
 		//std::copy(std::begin(other), std::end(other), std::begin(pixelData[i]));
 
-		//copy the column
-		Intensity* column = pixelData[x];
-		for(int y = 0; y < height; y++) {
-			column[y] = other.getPixel(x, y);
+		//copy the row
+		Intensity* row = pixelData[y];
+		for(int x = 0; x < width; x++) {
+			row[x] = other.getPixel(x, y);
 		}
 	}
 }
 
+
 IntensityImageStudent::IntensityImageStudent(const int width, const int height) :
-IntensityImage(width, height),
-pixelData{ new Intensity*[width] } //init pixelData as an array of columns (it's a column-major 2d array)
+IntensityImage{ width, height },
+pixelData{ new Intensity*[height] } //init pixelData as an array of rows (it's a row-major 2d array)
 {
-	for(int i = 0; i < width; i++) {
-		pixelData[i] = new Intensity[height]; //init all columns
+	//Init the whole memory as a contiguous block and let the first pointer point to the beginning of it.
+	//This also serves as the pointer to the first row
+	pixelData[0] = new Intensity[width * height];
+
+	//init the rest of the pointer to point to the individual rows within the contiguous block of memory
+	for(int i = 1; i < height; i++) { //we can skip the first row now so i starts at 1
+		pixelData[i] = &(pixelData[0][width * i]);
 	}
 }
+
 
 IntensityImageStudent::~IntensityImageStudent() {
 	if(pixelData != nullptr) { //don't attempt to delete when pixelData was never initialized
-		int width = getWidth();
-		for(int i = 0; i < width; i++) {
-			delete pixelData[i];
-		}
-		delete pixelData;
+		delete[] pixelData[0]; //Delete the entire contiguous block of memory
+		delete[] pixelData; //Delete the array of row pointers
 	}
 }
 
+
 void IntensityImageStudent::set(const int width, const int height) {
-	int oldWidth = getWidth();
 	IntensityImage::set(width, height);
 	//TODO: resize or create a new pixel storage (Don't forget to delete the old storage)
 
-	//delete old pixel storage
-	for(int i = 0; i < oldWidth; i++) {
-		delete pixelData[i];
+	//delete old pixel storage only if it has been initialized
+	if(pixelData != nullptr) {
+		delete[] pixelData[0];
+		delete[] pixelData;
 	}
-	delete pixelData;
 
-	//initialize some new memory with different dimensions
-	pixelData = new Intensity*[width];
-	for(int i = 0; i < width; i++) {
-		pixelData[i] = new Intensity[height]; //init all columns
+	//Init the whole memory as a contiguous block and let the first pointer point to the beginning of it.
+	//This also serves as the pointer to the first row
+	pixelData = new Intensity*[height];
+	pixelData[0] = new Intensity[width * height];
+
+	//init the rest of the pointer to point to the individual rows within the contiguous block of memory
+	for(int i = 1; i < height; i++) { //we can skip the first row now so i starts at 1
+		pixelData[i] = &(pixelData[0][width * i]);
 	}
 }
 
+
 void IntensityImageStudent::set(const IntensityImageStudent &other) {
-	int width = getWidth();
 	IntensityImage::set(other.getWidth(), other.getHeight());
 	//TODO: resize or create a new pixel storage and copy the object (Don't forget to delete the old storage)
 
-	//delete old pixel storage
-	for(int i = 0; i < width; i++) {
-		delete pixelData[i];
+	//delete old pixel storage only if it has been initialized
+	if(pixelData != nullptr) {
+		delete[] pixelData[0];
+		delete[] pixelData;
 	}
-	delete pixelData;
+
+	int height = other.getHeight();
+	int width = other.getWidth();
+
+	//initialize some new memory with different dimensions
+	pixelData = new Intensity*[height];
+
+	//Init the whole memory as a contiguous block and let the first pointer point to the beginning of it.
+	//This also serves as the pointer to the first row
+	pixelData[0] = new Intensity[width * height];
 
 	//copy other's pixelData
-	width = other.getWidth();
-	int height = other.getHeight();
-	for(int x = 0; x < width; x++) {
-		pixelData[x] = new Intensity[height]; //init new columns
+	for(int y = 0; y < height; y++) {
+		pixelData[y] = &(pixelData[0][width * y]);
 
 		//std::copy(std::begin(other), std::end(other), std::begin(pixelData[i]));
 
-		//copy the column
-		Intensity* column = pixelData[x];
-		for(int y = 0; y < height; y++) {
-			column[y] = other.getPixel(x, y);
+		//copy the row
+		Intensity* row = pixelData[y];
+		for(int x = 0; x < width; x++) {
+			row[x] = other.getPixel(x, y);
 		}
 	}
 }
+
 
 void IntensityImageStudent::setPixel(int x, int y, Intensity pixel) {
 #ifdef OUT_OF_BOUNDS_CHECK
 	if(x >= getWidth() || y >= getHeight()) {
-		throw "setPixel(int x, int y, Intensity pixel) x >= getWidth() || y >= getHeight()";
-		int throwError = 0, e = 1 / throwError;
+		throw IntensityImageException("setPixel(int x, int y, Intensity pixel) x >= getWidth() || y >= getHeight()");
 	}
 #endif
 
-	pixelData[x][y] = pixel;
+	pixelData[y][x] = pixel;
 }
+
 
 void IntensityImageStudent::setPixel(int i, Intensity pixel) {
-	/*
-	* TODO: set pixel i in "Row-Major Order"
-	*
-	*
-	* Original 2d image (values):
-	* 9 1 2
-	* 4 3 5
-	* 8 7 8
-	*
-	* 1d representation (i, value):
-	* i		value
-	* 0		9
-	* 1		1
-	* 2		2
-	* 3		4
-	* 4		3
-	* 5		5
-	* 6		8
-	* 7		7
-	* 8		8
-	*/
-	int width = getWidth();
-
 #ifdef OUT_OF_BOUNDS_CHECK
-	if(i >= width * getHeight()) {
-		throw "setPixel(int i, Intensity pixel) i >= width * getHeight()";
-		int throwError = 0, e = 1 / throwError;
+	if(i >= getWidth() * getHeight()) {
+		throw IntensityImageException("setPixel(int i, Intensity pixel) i >= getWidth() * getHeight()");
 	}
 #endif
 
-	pixelData[i % width][i / width] = pixel;
+	pixelData[0][i] = pixel;
 }
+
 
 Intensity IntensityImageStudent::getPixel(int x, int y) const {
 #ifdef OUT_OF_BOUNDS_CHECK
 	if(x >= getWidth() || y >= getHeight()) {
-		throw "Intensity::getPixel(int x, int y) x >= getWidth() || y >= getHeight()";
-		int throwError = 0, e = 1 / throwError;
+		throw IntensityImageException("getPixel(int x, int y) x >= getWidth() || y >= getHeight()");
 	}
 #endif
 
-	return pixelData[x][y];
+	return pixelData[y][x];
 }
 
-Intensity IntensityImageStudent::getPixel(int i) const {
-	int width = getWidth();
 
+Intensity IntensityImageStudent::getPixel(int i) const {
 #ifdef OUT_OF_BOUNDS_CHECK
-	if(i >= width * getHeight()) {
-		throw "Intensity::getPixel(int i) i >= width * getHeight()";
-		int throwError = 0, e = 1 / throwError;
+	if(i >= getWidth() * getHeight()) {
+		throw IntensityImageException("getPixel(i) i >= getWidth() * getHeight()");
 	}
 #endif
 
-	return pixelData[i % width][i / width];
+	return pixelData[0][i];
 }

@@ -19,14 +19,11 @@ public:
 
 #endif
 
-
-RGBImageStudent::RGBImageStudent() : RGBImage{}, pixelData{ nullptr }
-{
+RGBImageStudent::RGBImageStudent() : RGBImage(), pixelData{ nullptr } {
 }
 
-
 RGBImageStudent::RGBImageStudent(const RGBImageStudent &other) :
-RGBImage{ other.getWidth(), other.getHeight() },
+RGBImage(other.getWidth(), other.getHeight()),
 pixelData{ new RGB*[other.getHeight()] } //init pixelData as an array of rows (it's a row-major 2d array)
 {
 	int width = getWidth(), height = getHeight();
@@ -48,9 +45,8 @@ pixelData{ new RGB*[other.getHeight()] } //init pixelData as an array of rows (i
 	}
 }
 
-
 RGBImageStudent::RGBImageStudent(const int width, const int height) :
-RGBImage{ width, height },
+RGBImage(width, height),
 pixelData{ new RGB*[height] } //init pixelData as an array of rows (it's a row-major 2d array)
 {
 	//Init the whole memory as a contiguous block and let the first pointer point to the beginning of it.
@@ -63,14 +59,12 @@ pixelData{ new RGB*[height] } //init pixelData as an array of rows (it's a row-m
 	}
 }
 
-
 RGBImageStudent::~RGBImageStudent() {
 	if(pixelData != nullptr) { //don't attempt to delete when pixelData was never initialized
 		delete[] pixelData[0]; //Delete the entire contiguous block of memory
 		delete[] pixelData; //Delete the array of row pointers
 	}
 }
-
 
 void RGBImageStudent::set(const int width, const int height) {
 	RGBImage::set(width, height);
@@ -82,9 +76,11 @@ void RGBImageStudent::set(const int width, const int height) {
 		delete[] pixelData;
 	}
 
+	//initialize some new memory with different dimensions
+	pixelData = new RGB*[height];
+
 	//Init the whole memory as a contiguous block and let the first pointer point to the beginning of it.
 	//This also serves as the pointer to the first row
-	pixelData = new RGB*[height];
 	pixelData[0] = new RGB[width * height];
 
 	//init the rest of the pointer to point to the individual rows within the contiguous block of memory
@@ -92,7 +88,6 @@ void RGBImageStudent::set(const int width, const int height) {
 		pixelData[i] = &(pixelData[0][width * i]);
 	}
 }
-
 
 void RGBImageStudent::set(const RGBImageStudent &other) {
 	RGBImage::set(other.getWidth(), other.getHeight());
@@ -128,7 +123,6 @@ void RGBImageStudent::set(const RGBImageStudent &other) {
 	}
 }
 
-
 void RGBImageStudent::setPixel(int x, int y, RGB pixel) {
 #ifdef OUT_OF_BOUNDS_CHECK
 	if(x >= getWidth() || y >= getHeight()) {
@@ -139,8 +133,29 @@ void RGBImageStudent::setPixel(int x, int y, RGB pixel) {
 	pixelData[y][x] = pixel;
 }
 
-
 void RGBImageStudent::setPixel(int i, RGB pixel) {
+	/*
+	* TODO: set pixel i in "Row-Major Order"
+	*
+	*
+	* Original 2d image (values):
+	* 9 1 2
+	* 4 3 5
+	* 8 7 8
+	*
+	* 1d representation (i, value):
+	* i		value
+	* 0		9
+	* 1		1
+	* 2		2
+	* 3		4
+	* 4		3
+	* 5		5
+	* 6		8
+	* 7		7
+	* 8		8
+	*/
+
 #ifdef OUT_OF_BOUNDS_CHECK
 	if(i >= getWidth() * getHeight()) {
 		throw RGBImageException("setPixel(int i, RGB pixel) i >= getWidth() * getHeight()");
@@ -149,7 +164,6 @@ void RGBImageStudent::setPixel(int i, RGB pixel) {
 
 	pixelData[0][i] = pixel;
 }
-
 
 RGB RGBImageStudent::getPixel(int x, int y) const {
 #ifdef OUT_OF_BOUNDS_CHECK
@@ -160,7 +174,6 @@ RGB RGBImageStudent::getPixel(int x, int y) const {
 
 	return pixelData[y][x];
 }
-
 
 RGB RGBImageStudent::getPixel(int i) const {
 #ifdef OUT_OF_BOUNDS_CHECK

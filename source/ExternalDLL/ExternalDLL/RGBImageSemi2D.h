@@ -1,4 +1,27 @@
-#include "RGBImageStudent.h"
+#pragma once
+#include "RGBImage.h"
+
+class RGBImageStudent : public RGBImage
+{
+public:
+	RGBImageStudent();
+	RGBImageStudent(const RGBImageStudent &other);
+	RGBImageStudent(const int width, const int height);
+	virtual ~RGBImageStudent();
+
+	void set(const int width, const int height) override;
+	void set(const RGBImageStudent &other);
+
+	void setPixel(int x, int y, RGB pixel) override;
+	void setPixel(int i, RGB pixel) override;
+
+	RGB getPixel(int x, int y) const override;
+	RGB getPixel(int i) const override;
+
+private:
+	RGB** pixelData; //row major 2-d array of pixel structs on heap
+};
+
 
 //Comment this line out to disable checking for out-of-bounds errors within the pixel access methods
 //The out-of-bounds check also makes sure the image is initialized with a width>0 and height>0 before accessing any pixels because the default size is 0,0

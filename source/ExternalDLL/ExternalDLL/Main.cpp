@@ -4,13 +4,20 @@
 * Proprietary and confidential
 */
 
+
 #include <iostream> //std::cout
 #include "ImageIO.h" //Image load and save functionality
 #include "HereBeDragons.h"
 #include "ImageFactory.h"
 #include "DLLExecution.h"
 
+#include "StudentPreProcessing.h"
+
 #include "basetimer.h"
+
+//#include "RGBImage2dColumnMajor.h"
+//#include "RGBImage2dRowMajor.h"
+//#include "RGBImageSemi2D.h"
 
 void drawFeatureDebugImage(IntensityImage &image, FeatureMap &features);
 bool executeSteps(DLLExecution * executor);
@@ -26,98 +33,103 @@ int main(int argc, char * argv[]) {
 
 	try {
 		RGBImage * input = ImageFactory::newRGBImage();
-		if(!ImageIO::loadImage(R"R(C:\Users\Peter\Downloads\Vision\Practica_repo\testsets\Set A\fallen-storm-trooper.jpg)R", *input)) {
+		//if(!ImageIO::loadImage(R"R(C:\Users\Peter\Downloads\Vision\Practica_repo\testsets\Set A\fallen-storm-trooper.jpg)R", *input)) {
+		if(!ImageIO::loadImage(R"R(C:\Users\Peter\Downloads\Vision\Practica_repo\testsets\Set A\TestSet Images\female-2.png)R", *input)) {
 			std::cout << "Image could not be loaded!" << std::endl;
 			system("pause");
 			return 0;
 		}
 
+		//Some testing code for the grayscale conversion
+		//StudentPreProcessing spp{};
+		//IntensityImage* ii = spp.stepToIntensityImage(*input);
+		//ImageIO::showImage(*ii);
+		//delete ii;
 
-		//Time RGBImageStudent performance
-		BaseTimer timer{};
-		const int width = input->getWidth();
-		const int height = input->getHeight();
-		const int pixels = width * height;
-		const int repeats = 10;
+		//Time RGBImageStudent performance. This overrides the image with non-sense!!
+		//BaseTimer timer{};
+		//const int width = input->getWidth();
+		//const int height = input->getHeight();
+		//const int pixels = width * height;
+		//const int repeats = 10;
 
-		std::cout << "size: " << width << "x" << height << "\n";
-		std::cout << "pixels: " << pixels << "\n";
+		//std::cout << "size: " << width << "x" << height << "\n";
+		//std::cout << "pixels: " << pixels << "\n";
 
-		//getPixel(x, y) horizontal
-		timer.start();
-		for(int r = 0; r < repeats; r++) {
-			for(int y = 0; y < height; y++) {
-				for(int x = 0; x < width; x++) {
-					input->getPixel(x, y);
-				}
-			}
-		}
-		timer.stop();
-		std::cout << "getPixel(x, y) horizontal took: " << timer.elapsedMilliSeconds() << " ms\n";
-		timer.reset();
+		////getPixel(x, y) horizontal
+		//timer.start();
+		//for(int r = 0; r < repeats; r++) {
+		//	for(int y = 0; y < height; y++) {
+		//		for(int x = 0; x < width; x++) {
+		//			input->getPixel(x, y);
+		//		}
+		//	}
+		//}
+		//timer.stop();
+		//std::cout << "getPixel(x, y) horizontal took: " << timer.elapsedMilliSeconds() << " ms\n";
+		//timer.reset();
 
-		//getPixel(x, y) vertical
-		timer.start();
-		for(int r = 0; r < repeats; r++) {
-			for(int x = 0; x < width; x++) {
-				for(int y = 0; y < height; y++) {
-					input->getPixel(x, y);
-				}
-			}
-		}
-		timer.stop();
-		std::cout << "getPixel(x, y) vertical took: " << timer.elapsedMilliSeconds() << " ms\n";
-		timer.reset();
+		////getPixel(x, y) vertical
+		//timer.start();
+		//for(int r = 0; r < repeats; r++) {
+		//	for(int x = 0; x < width; x++) {
+		//		for(int y = 0; y < height; y++) {
+		//			input->getPixel(x, y);
+		//		}
+		//	}
+		//}
+		//timer.stop();
+		//std::cout << "getPixel(x, y) vertical took: " << timer.elapsedMilliSeconds() << " ms\n";
+		//timer.reset();
 
-		//getPixel(i)
-		timer.start();
-		for(int r = 0; r < repeats; r++) {
-			for(int i = 0; i < pixels; i++) {
-				input->getPixel(i);
-			}
-		}
-		timer.stop();
-		std::cout << "getPixel(i) took: " << timer.elapsedMilliSeconds() << " ms\n";
-		timer.reset();
+		////getPixel(i)
+		//timer.start();
+		//for(int r = 0; r < repeats; r++) {
+		//	for(int i = 0; i < pixels; i++) {
+		//		input->getPixel(i);
+		//	}
+		//}
+		//timer.stop();
+		//std::cout << "getPixel(i) took: " << timer.elapsedMilliSeconds() << " ms\n";
+		//timer.reset();
 
-		//setPixel(x, y) horizontal
-		timer.start();
-		for(int r = 0; r < repeats; r++) {
-			for(int y = 0; y < height; y++) {
-				for(int x = 0; x < width; x++) {
-					input->setPixel(x, y, { 1, 2, 3 });
-				}
-			}
-		}
-		timer.stop();
-		std::cout << "setPixel(x, y) horizontal took: " << timer.elapsedMilliSeconds() << " ms\n";
-		timer.reset();
+		////setPixel(x, y) horizontal
+		//timer.start();
+		//for(int r = 0; r < repeats; r++) {
+		//	for(int y = 0; y < height; y++) {
+		//		for(int x = 0; x < width; x++) {
+		//			input->setPixel(x, y, { 1, 2, 3 });
+		//		}
+		//	}
+		//}
+		//timer.stop();
+		//std::cout << "setPixel(x, y) horizontal took: " << timer.elapsedMilliSeconds() << " ms\n";
+		//timer.reset();
 
-		//setPixel(x, y) vertical
-		timer.start();
-		for(int r = 0; r < repeats; r++) {
-			for(int x = 0; x < width; x++) {
-				for(int y = 0; y < height; y++) {
-					input->setPixel(x, y, { 1, 2, 3 });
-				}
-			}
-		}
-		timer.stop();
-		std::cout << "setPixel(x, y) vertical took: " << timer.elapsedMilliSeconds() << " ms\n";
-		timer.reset();
+		////setPixel(x, y) vertical
+		//timer.start();
+		//for(int r = 0; r < repeats; r++) {
+		//	for(int x = 0; x < width; x++) {
+		//		for(int y = 0; y < height; y++) {
+		//			input->setPixel(x, y, { 1, 2, 3 });
+		//		}
+		//	}
+		//}
+		//timer.stop();
+		//std::cout << "setPixel(x, y) vertical took: " << timer.elapsedMilliSeconds() << " ms\n";
+		//timer.reset();
 
-		//setPixel(i)
-		timer.start();
-		for(int r = 0; r < repeats; r++) {
-			for(int i = 0; i < pixels; i++) {
-				input->setPixel(i, { 255, 0, 255 });
-			}
-		}
-		timer.stop();
-		std::cout << "setPixel(i) took: " << timer.elapsedMilliSeconds() << " ms\n";
-		timer.reset();
-
-		ImageIO::showImage(*input);
+		////setPixel(i)
+		//timer.start();
+		//for(int r = 0; r < repeats; r++) {
+		//	for(int i = 0; i < pixels; i++) {
+		//		input->setPixel(i, { 255, 0, 255 });
+		//	}
+		//}
+		//timer.stop();
+		//std::cout << "setPixel(i) took: " << timer.elapsedMilliSeconds() << " ms\n";
+		//timer.reset();
+		//================End of performance test==============
 
 		ImageIO::saveRGBImage(*input, ImageIO::getDebugFileName("debug.png"));
 
@@ -153,10 +165,11 @@ int main(int argc, char * argv[]) {
 bool executeSteps(DLLExecution * executor) {
 
 	//Execute the four Pre-processing steps
-	if (!executor->executePreProcessingStep1(false)) {
+	if(!executor->executePreProcessingStep1(true)) {
 		std::cout << "Pre-processing step 1 failed!" << std::endl;
 		return false;
 	}
+	ImageIO::saveIntensityImage(*executor->resultPreProcessingStep1, ImageIO::getDebugFileName("Pre-processing-1.png"));
 
 	if (!executor->executePreProcessingStep2(false)) {
 		std::cout << "Pre-processing step 2 failed!" << std::endl;
